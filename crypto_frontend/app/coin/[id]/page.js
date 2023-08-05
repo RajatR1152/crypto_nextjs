@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import LineChart from '@/components/LineChart';
 import FormatPrice from '@/components/FormatPrice';
@@ -13,6 +13,7 @@ export default function page() {
   const { isLogedIn, setIsLogedIn } = useContext(LoginContext);
 
   const param = useParams();
+  const router = useRouter
   const [user, setUser] = useState([]);
   const [data, setData] = useState([]);
   const [img, setImg] = useState('');
@@ -54,9 +55,9 @@ export default function page() {
 
   }, []);
 
-  if (isLogedIn) {
+  // if (isLogedIn) {
     const isMarked = bookmarkedData.find((e) => e.id == param.id);
-  }
+  // }
 
   async function addToWatchlist() {
     const bookmark_data = {
@@ -65,13 +66,14 @@ export default function page() {
       username: user.username
     }
     axios.post('http://localhost:5000/addbookmarks', bookmark_data).then((res) => {
-      Window.location.reload();
+      window.location.reload();
     })
+
   }
 
   function removeBookmark(d) {
     axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-      Window.location.reload();
+      window.location.reload();
     })
   }
 
@@ -83,13 +85,17 @@ export default function page() {
           <img src={img} alt="" className="w-14 md:w-16 rounded-full" />
           <h1 className="text-5xl font-bold capitalize mt-4 ms-4">{data.id}</h1>
           {
-            isMarked ?
-              (<BsBookmarkCheckFill onClick={() => { removeBookmark(data.id) }} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
-              )
+            isLogedIn ?
+
+              isMarked ?
+                (<BsBookmarkCheckFill onClick={() => { removeBookmark(data.id) }} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
+                )
+                :
+                (
+                  <BsBookmark onClick={() => { addToWatchlist(data) }} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
+                )
               :
-              (
-                <BsBookmark onClick={() => { addToWatchlist(data) }} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
-              )
+              (<></>)
           }
         </div>
         <table className='table-auto border-x text-center border-white w-full'>
