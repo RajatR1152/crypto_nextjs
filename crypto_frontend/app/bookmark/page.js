@@ -1,16 +1,25 @@
 'use client'
 import axios from 'axios';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import FormatPrice from '@/components/FormatPrice';
 import { RxCross2 } from 'react-icons/rx';
 import { BsBookmark } from 'react-icons/bs';
+import { LoginContext } from '@/context/LoginContext';
+import { useRouter } from 'next/navigation';
 
 export default function page() {
+
+    const { isLogedIn, setIsLogedIn } = useContext(LoginContext);
+    const router = useRouter();
 
     const [data, setData] = useState([]);
     const [user, setUser] = useState([]);
     const [coin, setCoin] = useState([]);
+
+    if (!isLogedIn) {
+        router.push('/login');
+    }
 
     useEffect(() => {
         const userData = localStorage.getItem('user');

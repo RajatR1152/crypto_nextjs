@@ -1,13 +1,16 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import LineChart from '@/components/LineChart';
 import FormatPrice from '@/components/FormatPrice';
 import { BsBookmark } from 'react-icons/bs';
 import { BsBookmarkCheckFill } from 'react-icons/bs'
+import { LoginContext } from '@/context/LoginContext';
 
 export default function page() {
+
+  const { isLogedIn, setIsLogedIn } = useContext(LoginContext);
 
   const param = useParams();
   const [user, setUser] = useState([]);
@@ -25,13 +28,16 @@ export default function page() {
   const [bookmarkedData, setBookmarkedData] = useState([]);
 
   useEffect(() => {
-    const userData = localStorage.getItem('user');
-    const orignalData = JSON.parse(userData);
-    setUser(orignalData);
 
-    axios.post('http://localhost:5000/bookmarks', { 'username': orignalData.username }).then((res) => {
-      setBookmarkedData(res.data.data);
-    })
+    if (isLogedIn) {
+      const userData = localStorage.getItem('user');
+      const orignalData = JSON.parse(userData);
+      setUser(orignalData);
+
+      axios.post('http://localhost:5000/bookmarks', { 'username': orignalData.username }).then((res) => {
+        setBookmarkedData(res.data.data);
+      })
+    }
 
     axios.get(`https://api.coingecko.com/api/v3/coins/${param.id}?market_data=true`).then((res) => {
       setData(res.data);
@@ -48,7 +54,9 @@ export default function page() {
 
   }, []);
 
-  const isMarked = bookmarkedData.find((e) => e.id == param.id);
+  if (isLogedIn) {
+    const isMarked = bookmarkedData.find((e) => e.id == param.id);
+  }
 
   async function addToWatchlist() {
     const bookmark_data = {
@@ -76,7 +84,7 @@ export default function page() {
           <h1 className="text-5xl font-bold capitalize mt-4 ms-4">{data.id}</h1>
           {
             isMarked ?
-              (<BsBookmarkCheckFill onClick={()=>{removeBookmark(data.id)}} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
+              (<BsBookmarkCheckFill onClick={() => { removeBookmark(data.id) }} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
               )
               :
               (
