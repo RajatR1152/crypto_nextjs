@@ -2,12 +2,10 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function HeroTable() {
 
     const [data, setData] = useState([]);
-    const router = useRouter();
 
     useEffect(() => {
         axios.get('https://api.coingecko.com/api/v3/coins/markets?vs_currency=inr&order=market_cap_desc&per_page=10&page=1&sparkline=false&locale=en').then((res) => {
@@ -52,7 +50,8 @@ export default function HeroTable() {
                 </table>
             </div>
 
-            <button onClick={()=>{router.push('/market')}} className="bg-transparent rounded-lg my-5 hover:border-violet-800 hover:bg-purple p-5 w-11/12 mx-auto border-2 border-white text-xl font-bold">See more</button>
+            <button className="bg-transparent rounded-lg my-5 hover:border-violet-800 hover:bg-purple p-5 w-11/12 mx-auto border-2 border-white text-xl font-bold"><Link href={'/market'} >See more</Link></button>
+
         </div>
     )
 }

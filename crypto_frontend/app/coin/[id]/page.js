@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import axios from 'axios';
 import LineChart from '@/components/LineChart';
 import FormatPrice from '@/components/FormatPrice';
@@ -13,7 +13,6 @@ export default function page() {
   const { isLogedIn, setIsLogedIn } = useContext(LoginContext);
 
   const param = useParams();
-  const router = useRouter();
   const [user, setUser] = useState([]);
   const [data, setData] = useState([]);
   const [img, setImg] = useState('');
@@ -28,8 +27,6 @@ export default function page() {
   const [capChange, setCapChange] = useState('');
   const [bookmarkedData, setBookmarkedData] = useState([]);
 
-
-
   useEffect(() => {
 
     if (isLogedIn) {
@@ -37,7 +34,9 @@ export default function page() {
       const orignalData = JSON.parse(userData);
       setUser(orignalData);
 
-      fetchData();
+      axios.post('http://localhost:5000/bookmarks', { 'username': orignalData.username }).then((res) => {
+        setBookmarkedData(res.data.data);
+      })
     }
 
     axios.get(`https://api.coingecko.com/api/v3/coins/${param.id}?market_data=true`).then((res) => {
@@ -55,11 +54,7 @@ export default function page() {
 
   }, []);
 
-  function fetchData() {
-    axios.post('http://localhost:5000/bookmarks', { 'username': user.username }).then((res) => {
-      setBookmarkedData(res.data.data);
-    })
-  }
+    const isMarked = bookmarkedData.find((e) => e.id == param.id);
 
   async function addToWatchlist() {
     const bookmark_data = {
@@ -68,15 +63,14 @@ export default function page() {
       username: user.username
     }
     axios.post('http://localhost:5000/addbookmarks', bookmark_data).then((res) => {
-      fetchData();
-      router.push(`/coin/${param.id}`);
+      window.location.reload();
     })
+
   }
-  const isMarked = bookmarkedData.find((e) => e.id == param.id);
 
   function removeBookmark(d) {
     axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-      router.push(`/coin/${param.id}`);
+      window.location.reload();
     })
   }
 

@@ -18,28 +18,29 @@ export default function page() {
     const [coin, setCoin] = useState([]);
 
     if (!isLogedIn) {
-        router.push('/login');
+        return (
+            <>
+                <div className="h-screen w-screen ">
+                    <div className="w-fit p-4 my-40 mx-auto">
+                        <Link href={'/login'} className="p-5 bg-purple rounded-lg text-xl">back to login</Link>
+                    </div>
+                </div>
+            </>
+        )
     }
 
     useEffect(() => {
         const userData = localStorage.getItem('user');
         const orignalData = JSON.parse(userData);
         setUser(orignalData);
-        fetchData();
-    }, [])
-
-    function fetchData() {
-        axios.post('http://localhost:5000/bookmarks', { 'username': user.username }).then((res) => {
+        axios.post('http://localhost:5000/bookmarks', { 'username': orignalData.username }).then((res) => {
             setData(res.data.data);
         })
-    }
+    }, [])
 
     function removeBookmark(d) {
         axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-            fetchData();
-            setTimeout(() => {
-                router.push('/bookmark');
-            }, 1500);
+            Window.location.reload(true);
         })
     }
 
