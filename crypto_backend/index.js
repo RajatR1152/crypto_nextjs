@@ -72,10 +72,12 @@ app.post('/remove', (req, res) => {
     const { id, username } = req.body;
     let remaining = [];
 
+    console.log(req.body)
+
     user.findOne({ 'username': username }).then((data) => {
         data.bookmarks.map((b) => {
             if (b.id == id) {
-                res.status(200).send({ 'message': 'bookmark removed' })
+                
             }
             else {
                 remaining.push(b);
@@ -83,6 +85,7 @@ app.post('/remove', (req, res) => {
         })
         data.bookmarks = remaining;
         data.save();
+        res.status(200).send({ 'message': 'bookmark removed' });
     })
 
 })

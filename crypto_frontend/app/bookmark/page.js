@@ -25,14 +25,21 @@ export default function page() {
         const userData = localStorage.getItem('user');
         const orignalData = JSON.parse(userData);
         setUser(orignalData);
-        axios.post('http://localhost:5000/bookmarks', { 'username': orignalData.username }).then((res) => {
+        fetchData();
+    }, [])
+
+    function fetchData() {
+        axios.post('http://localhost:5000/bookmarks', { 'username': user.username }).then((res) => {
             setData(res.data.data);
         })
-    }, [])
+    }
 
     function removeBookmark(d) {
         axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-            window.location.reload(true);
+            fetchData();
+            setTimeout(() => {
+                router.push('/bookmark');
+            }, 1500);
         })
     }
 

@@ -13,7 +13,7 @@ export default function page() {
   const { isLogedIn, setIsLogedIn } = useContext(LoginContext);
 
   const param = useParams();
-  const router = useRouter
+  const router = useRouter();
   const [user, setUser] = useState([]);
   const [data, setData] = useState([]);
   const [img, setImg] = useState('');
@@ -28,6 +28,8 @@ export default function page() {
   const [capChange, setCapChange] = useState('');
   const [bookmarkedData, setBookmarkedData] = useState([]);
 
+
+
   useEffect(() => {
 
     if (isLogedIn) {
@@ -35,9 +37,7 @@ export default function page() {
       const orignalData = JSON.parse(userData);
       setUser(orignalData);
 
-      axios.post('http://localhost:5000/bookmarks', { 'username': orignalData.username }).then((res) => {
-        setBookmarkedData(res.data.data);
-      })
+      fetchData();
     }
 
     axios.get(`https://api.coingecko.com/api/v3/coins/${param.id}?market_data=true`).then((res) => {
@@ -55,9 +55,11 @@ export default function page() {
 
   }, []);
 
-  // if (isLogedIn) {
-    const isMarked = bookmarkedData.find((e) => e.id == param.id);
-  // }
+  function fetchData() {
+    axios.post('http://localhost:5000/bookmarks', { 'username': user.username }).then((res) => {
+      setBookmarkedData(res.data.data);
+    })
+  }
 
   async function addToWatchlist() {
     const bookmark_data = {
@@ -66,14 +68,15 @@ export default function page() {
       username: user.username
     }
     axios.post('http://localhost:5000/addbookmarks', bookmark_data).then((res) => {
-      window.location.reload();
+      fetchData();
+      router.push(`/coin/${param.id}`);
     })
-
   }
+  const isMarked = bookmarkedData.find((e) => e.id == param.id);
 
   function removeBookmark(d) {
     axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-      window.location.reload();
+      router.push(`/coin/${param.id}`);
     })
   }
 
@@ -86,7 +89,6 @@ export default function page() {
           <h1 className="text-5xl font-bold capitalize mt-4 ms-4">{data.id}</h1>
           {
             isLogedIn ?
-
               isMarked ?
                 (<BsBookmarkCheckFill onClick={() => { removeBookmark(data.id) }} size={40} className='ms-auto cursor-pointer md:me-5 me-6 mt-4' />
                 )
