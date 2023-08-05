@@ -50,8 +50,6 @@ export default function page() {
 
   const isMarked = bookmarkedData.find((e) => e.id == param.id);
 
-  console.log(isMarked);
-
   async function addToWatchlist() {
     const bookmark_data = {
       id: data.id,
@@ -59,14 +57,12 @@ export default function page() {
       username: user.username
     }
     axios.post('http://localhost:5000/addbookmarks', bookmark_data).then((res) => {
-      console.log(res);
       window.location.reload();
     })
   }
 
   function removeBookmark(d) {
     axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-      console.log(res);
       window.location.reload();
     })
   }

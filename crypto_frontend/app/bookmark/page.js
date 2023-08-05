@@ -23,7 +23,6 @@ export default function page() {
 
     function removeBookmark(d) {
         axios.post('http://localhost:5000/remove', { 'id': d, 'username': user.username }).then((res) => {
-            console.log(res);
             window.location.reload();
         })
     }
